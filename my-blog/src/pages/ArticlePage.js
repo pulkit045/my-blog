@@ -7,7 +7,7 @@ import CommentsList from "../components/CommentsList";
 import AddCommentForm from "../components/AddCommentForm";
 import articles from "./article-content";
 
-const config = {
+var config = {
   headers: {
     "Access-Control-Allow-Origin": "*",
     "Access-Control-Allow-Methods": "GET,PUT,POST,DELETE,PATCH,OPTIONS",
@@ -17,15 +17,21 @@ const config = {
 const ArticlePage = () => {
   const [articleInfo, setArticleInfo] = useState({ upvotes: 0, comments: [] });
   const { articleId } = useParams();
-  const { user } = useUser();
+  const  user  = useUser();
 
+  
   useEffect(() => {
+    
+
     const loadArticleInfo = async () => {
-      const token = user && (await user.getIdToken());
+
+      console.log(user.user.accessToken);
+      const token =user.user.accessToken;
+      // console.log(token);
       if (token) {
-        config.headers.authtoken = token;
+        config.headers.Authorization = 'Bearer ' +token;
       } else {
-        config.headers.authtoken = null;
+        config.headers.Authorization = null;
       }
 
       const response = await axios.get(
@@ -34,20 +40,27 @@ const ArticlePage = () => {
       );
       const newArticleInfo = response.data;
       setArticleInfo(newArticleInfo);
-    };
-
+    }; 
+ 
     loadArticleInfo();
   }, []);
 
   const article = articles.find((article) => article.name === articleId);
 
+
+
   const addUpvote = async () => {
-    const token = user && (await user.getIdToken());
+
+    //console.log(user);
+    const token =user.user.accessToken;
+    // console.log(token);
     if (token) {
-      config.headers.authtoken = token;
+      config.headers.Authorization = 'Bearer ' +token;
     } else {
-      config.headers.authtoken = null;
+      config.headers.Authorization = null;
     }
+
+    //console.log("config ",config.headers.Authorization);
     const response = await axios.put(
       `http://localhost:8000/api/articles/${articleId}/upvote`,
       null,

@@ -13,17 +13,19 @@ admin.initializeApp({
 const app = express();
 app.use(express.json());
 app.use(cors());
-
+ 
 
 app.use(morgan('dev'))
 
+
+
 app.use(async (req, res, next) => {
   const { authorization } = req.headers;
-//  console.log(authorization);
-
-
-  if (authorization !== null || undefined) {
+ // console.log(req.headers, "headers");
+    
+  if (authorization != undefined) {
     try {
+      console.log("authoriation");
       const token = (authorization.split(" "))[1];
       //console.log(authorization);
       req.user = await admin.auth().verifyIdToken(token);
@@ -44,8 +46,7 @@ app.get("/api/articles/:name", async (req, res) => {
   const { name } = req.params;
   const { uid } = req.user;
 
-  console.log(uid);
-  return
+ 
   const article = await db.collection("articles").findOne({ name });
 
   if (article) {
@@ -93,8 +94,6 @@ app.post("/api/articles/:name/comments", async (req, res) => {
   const { email } = req.user;
 
 
-
-  return
 
   await db.collection("articles").updateOne(
     { name },
